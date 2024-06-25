@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include "navbar.html" %}
+
+<style>
+    
+
+    .feedback-container {
+        text-align: center;
+        max-width: calc(100%-40px);
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .feedback-container h2,
+    .feedback-container p {
+        color: purple;
+        margin-bottom: 20px;
+    }
+
+    .feedback-form {
+        width: 100%;
+    }
+
+    .feedback-form input,
+    .feedback-form select {
+        width: 50%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .feedback-form textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .feedback-form textarea {
+        resize: none;
+        overflow: hidden;
+        min-height: 100px;
+    }
+
+    .feedback-form button {
+        background: purple;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        padding: 10px 20px;
+        transition: background 0.3s ease;
+    }
+
+    .feedback-form button:hover {
+        background: darkorchid;
+    }
+</style>
+
+<div class="feedback-container">
+    <h2>We value your feedback.</h2>
+    <p>Please fill out the form below to help us improve our service.</p>
+
+    <div class="feedback-form">
+        <form id="feedback-form">
+            <input type="text" id="name" name="name" placeholder="Your Name" required>
+            <input type="email" id="email" name="email" placeholder="Your Email" required>
+            <select id="emoji" name="emoji">
+                <option value="issue">Issue</option>
+                <option value="suggestion">Suggestion</option>
+                <option value="praise">other</option>
+            </select><br><br>
+            <textarea id="feedback" name="feedback" placeholder="Type your feedback here..." required></textarea>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const feedbackTextarea = document.getElementById('feedback');
+
+        // Adjust textarea height as user types
+        feedbackTextarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Clear placeholder when typing starts
+        feedbackTextarea.addEventListener('focus', function() {
+            if (this.placeholder === "Type your feedback here...") {
+                this.placeholder = "";
+            }
+        });
+
+        // Restore placeholder if empty when focus is lost
+        feedbackTextarea.addEventListener('blur', function() {
+            if (this.placeholder === "") {
+                this.placeholder = "Type your feedback here...";
+            }
+        });
+
+        const feedbackForm = document.getElementById('feedback-form');
+
+        feedbackForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const feedback = formData.get('feedback').trim();
+            if (feedback) {
+                sendFeedback(formData);
+                feedbackTextarea.value = '';
+            } else {
+                alert('Please enter your feedback!');
+            }
+        });
+
+        function sendFeedback(formData) {
+            fetch('/feedback', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Feedback sent successfully!');
+                    alert('Feedback submitted successfully!');
+                } else {
+                    console.error('Failed to send feedback:', response.statusText);
+                    alert('Failed to submit feedback.');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending feedback:', error);
+                alert('Failed to submit feedback. Please try again later.');
+            });
+        }
+    });
+</script>
+{% endblock %}

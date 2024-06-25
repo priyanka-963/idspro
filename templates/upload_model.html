@@ -1,0 +1,105 @@
+<!-- templates/upload_model.html -->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Model</title>
+    <style>
+        .feedback-container {
+            text-align: center;
+            max-width: calc(100% - 40px);
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: auto;
+            margin-top: 50px;
+        }
+
+        .feedback-container h2,
+        .feedback-container p {
+            color: purple;
+            margin-bottom: 20px;
+        }
+
+        .feedback-form {
+            width: 100%;
+        }
+
+        .feedback-form input,
+        .feedback-form select {
+            width: 50%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .feedback-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .feedback-form textarea {
+            resize: none;
+            overflow: hidden;
+            min-height: 100px;
+        }
+
+        .feedback-form button {
+            background: purple;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: background 0.3s ease;
+        }
+
+        .feedback-form button:hover {
+            background: darkorchid;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="feedback-container">
+        <h2>Upload Model</h2>
+        <form id="upload-form" class="feedback-form" enctype="multipart/form-data">
+            <label for="file">Choose a model file (h5 or model):</label><br>
+            <input type="file" id="file" name="file"><br>
+            <button type="submit">Upload</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#upload-form').on('submit', function(event) {
+                event.preventDefault();
+
+                var formData = new FormData(this);
+                
+                $.ajax({
+                    url: '/testmodel/upload_model',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response.success) {
+                            $('#result').html('<p>Accuracy: ' + response.accuracy + '</p>');
+                        } else {
+                            $('#result').html('<p>Error: ' + response.message + '</p>');
+                        }
+                    },
+                    error: function() {
+                        $('#result').html('<p>An error occurred while uploading the model.</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

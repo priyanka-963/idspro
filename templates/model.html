@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include "navbar.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Training</title>
+    <style>
+        .feedback-container {
+            text-align: center;
+            max-width: calc(100%-40px);
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .feedback-container h2,
+        .feedback-container p {
+            color: purple;
+            margin-bottom: 20px;
+        }
+
+        .feedback-form {
+            width: 100%;
+        }
+
+        .feedback-form input,
+        .feedback-form select {
+            width: 50%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .feedback-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .feedback-form textarea {
+            resize: none;
+            overflow: hidden;
+            min-height: 100px;
+        }
+
+        .feedback-form button {
+            background: purple;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: background 0.3s ease;
+        }
+
+        .feedback-form button:hover {
+            background: darkorchid;
+        }
+    </style>
+</head>
+<body>
+    <div class="feedback-container">
+        <h2>Train Your Model</h2>
+        <p>Upload a CSV file and choose a model to train:</p>
+
+        <div class="feedback-form">
+            <form id="upload-form" enctype="multipart/form-data">
+                <input type="file" id="file-input" name="file" accept=".csv" required>
+
+                <button type="button" onclick="trainModel('ml')">Train ML Model</button>
+                <button type="button" onclick="trainModel('dl')">Train DL Model</button>
+            </form>
+            <div id="progress" style="margin-top: 20px;"></div>
+            <div id="download-link" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <script>
+        function trainModel(modelType) {
+            const fileInput = document.getElementById('file-input');
+            if (fileInput.files.length === 0) {
+                alert('Please select a CSV file to upload.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            if (file.type !== 'text/csv') {
+                alert('Invalid file type. Please upload a CSV file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('model_type', modelType);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload', true);
+
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    const percentComplete = (event.loaded / event.total) * 100;
+                    document.getElementById('progress').innerText = `Upload progress: ${percentComplete.toFixed(2)}%`;
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        document.getElementById('progress').innerText = 'Training completed.';
+                        document.getElementById('download-link').innerHTML = `<a href="/download/${response.filename}">Download Trained Model</a>`;
+                    } else {
+                        document.getElementById('progress').innerText = 'Training failed.';
+                    }
+                } else {
+                    document.getElementById('progress').innerText = 'An error occurred during the upload.';
+                }
+            };
+
+            xhr.send(formData);
+        }
+    </script>
+</body>
+</html>
+{% endblock %}

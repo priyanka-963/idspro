@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Model Training and Testing</title>
+</head>
+<body>
+    <h1>Upload Dataset and Model</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="file">Upload Dataset (CSV):</label>
+        <input type="file" name="file" id="file" required>
+        <br><br>
+        <label for="model_type">Model Type:</label>
+        <select name="model_type" id="model_type">
+            <option value="ml">Machine Learning</option>
+        </select>
+        <br><br>
+        <label for="model_file">Upload Pre-trained Model (.model):</label>
+        <input type="file" name="model_file" id="model_file">
+        <br><br>
+        <input type="submit" value="Upload and Train/Test">
+    </form>
+</body>
+</html>
